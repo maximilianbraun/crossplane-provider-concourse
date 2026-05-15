@@ -6,6 +6,7 @@ import (
 
 	"github.com/concourse/concourse/atc"
 	goconcourse "github.com/concourse/concourse/go-concourse/concourse"
+	"k8s.io/utils/ptr"
 
 	civ1alpha1 "github.com/maximilianbraun/crossplane-provider-concourse/apis/ci/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -73,9 +74,7 @@ func (m *mockTeam) HidePipeline(ref atc.PipelineRef) (bool, error) {
 	return true, nil
 }
 
-func boolPtr(b bool) *bool { return &b }
-
-func newPipelineMR(team, pipeline, inlineConfig string, paused, exposed *bool) *civ1alpha1.Pipeline {
+func newPipelineMR(team, pipeline, inlineConfig string, paused, exposed *bool) *civ1alpha1.Pipeline { //nolint:unparam
 	return &civ1alpha1.Pipeline{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-pipeline"},
 		Spec: civ1alpha1.PipelineSpec{
@@ -102,7 +101,7 @@ func TestObserve_PipelineFound(t *testing.T) {
 		},
 	}
 	e := &external{concourse: mc, kube: nil}
-	mg := newPipelineMR("team", "my-pipeline", "jobs: []", boolPtr(false), boolPtr(true))
+	mg := newPipelineMR("team", "my-pipeline", "jobs: []", ptr.To(false), ptr.To(true))
 
 	obs, err := e.Observe(context.Background(), mg)
 	if err != nil {
@@ -149,7 +148,7 @@ func TestObserve_PauseDrift(t *testing.T) {
 		},
 	}
 	e := &external{concourse: mc, kube: nil}
-	mg := newPipelineMR("team", "my-pipeline", "jobs: []", boolPtr(false), nil)
+	mg := newPipelineMR("team", "my-pipeline", "jobs: []", ptr.To(false), nil)
 
 	obs, err := e.Observe(context.Background(), mg)
 	if err != nil {
@@ -163,7 +162,7 @@ func TestObserve_PauseDrift(t *testing.T) {
 func TestCreate_InlineConfig(t *testing.T) {
 	mc := &mockClient{}
 	e := &external{concourse: mc, kube: nil}
-	mg := newPipelineMR("team", "my-pipeline", "jobs:\n- name: test", boolPtr(true), boolPtr(true))
+	mg := newPipelineMR("team", "my-pipeline", "jobs:\n- name: test", ptr.To(true), ptr.To(true))
 
 	_, err := e.Create(context.Background(), mg)
 	if err != nil {
@@ -202,7 +201,7 @@ func TestDelete_Pipeline(t *testing.T) {
 func TestUpdate_SyncsPauseAndExpose(t *testing.T) {
 	mc := &mockClient{}
 	e := &external{concourse: mc, kube: nil}
-	mg := newPipelineMR("team", "my-pipeline", "jobs: []", boolPtr(false), boolPtr(false))
+	mg := newPipelineMR("team", "my-pipeline", "jobs: []", ptr.To(false), ptr.To(false))
 
 	_, err := e.Update(context.Background(), mg)
 	if err != nil {

@@ -14,7 +14,7 @@ const (
 
 var (
 	SchemeGroupVersion = schema.GroupVersion{Group: Group, Version: Version}
-	SchemeBuilder      = &scheme.Builder{GroupVersion: SchemeGroupVersion}
+	SchemeBuilder      = &scheme.Builder{GroupVersion: SchemeGroupVersion} //nolint:staticcheck // standard Crossplane pattern
 	AddToScheme        = SchemeBuilder.AddToScheme
 )
 
@@ -37,17 +37,12 @@ func init() {
 	)
 }
 
-// TeamKind is the kind for Team.
-var TeamKind = reflect.TypeOf(Team{}).Name()
+var TeamKind = reflect.TypeFor[Team]().Name()
 
-// TeamGroupKind is the group-kind for Team.
 var TeamGroupKind = schema.GroupKind{Group: Group, Kind: TeamKind}.String()
 
-// TeamGroupVersionKind is the GVK for Team.
 var TeamGroupVersionKind = SchemeGroupVersion.WithKind(TeamKind)
 
-// PipelineKind is the kind for Pipeline.
-var PipelineKind = reflect.TypeOf(Pipeline{}).Name()
+var PipelineKind = reflect.TypeFor[Pipeline]().Name()
 
-// PipelineGroupVersionKind is the GVK for Pipeline.
 var PipelineGroupVersionKind = SchemeGroupVersion.WithKind(PipelineKind)

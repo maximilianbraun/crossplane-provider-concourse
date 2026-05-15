@@ -53,7 +53,7 @@ func (m *mockTeam) CreateJobBuild(ref atc.PipelineRef, jobName string) (atc.Buil
 	}, nil
 }
 
-func newBuildMR(team, pipeline, job string) *civ1alpha1.Build {
+func newBuildMR(team, pipeline, job string) *civ1alpha1.Build { //nolint:unparam
 	return &civ1alpha1.Build{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-build"},
 		Spec: civ1alpha1.BuildSpec{

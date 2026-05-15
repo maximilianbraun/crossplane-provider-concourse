@@ -33,9 +33,9 @@ func (m *mockClient) Team(name string) goconcourse.Team {
 
 type mockTeam struct {
 	goconcourse.Team
-	name       string
-	created    *atc.Team
-	destroyed  bool
+	name      string
+	created   *atc.Team
+	destroyed bool
 }
 
 func (m *mockTeam) CreateOrUpdate(team atc.Team) (atc.Team, bool, bool, []goconcourse.ConfigWarning, error) {
@@ -48,7 +48,7 @@ func (m *mockTeam) DestroyTeam(name string) error {
 	return nil
 }
 
-func newTeamMR(name, teamName string) *civ1alpha1.Team {
+func newTeamMR(name, teamName string) *civ1alpha1.Team { //nolint:unparam
 	return &civ1alpha1.Team{
 		ObjectMeta: metav1.ObjectMeta{Name: name},
 		Spec: civ1alpha1.TeamSpec{

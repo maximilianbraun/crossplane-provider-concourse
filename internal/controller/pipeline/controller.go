@@ -83,13 +83,8 @@ func (e *external) Observe(ctx context.Context, mg *civ1alpha1.Pipeline) (manage
 	configHash := sha256Hash(desiredConfig)
 	mg.Status.AtProvider.ConfigHash = configHash
 
-	upToDate := true
-	if mg.Spec.ForProvider.Paused != nil && *mg.Spec.ForProvider.Paused != pipeline.Paused {
-		upToDate = false
-	}
-	if mg.Spec.ForProvider.Exposed != nil && *mg.Spec.ForProvider.Exposed != pipeline.Public {
-		upToDate = false
-	}
+	upToDate := (mg.Spec.ForProvider.Paused == nil || *mg.Spec.ForProvider.Paused == pipeline.Paused) &&
+		(mg.Spec.ForProvider.Exposed == nil || *mg.Spec.ForProvider.Exposed == pipeline.Public)
 
 	mg.SetConditions(xpv1.Available())
 	return managed.ExternalObservation{ResourceExists: true, ResourceUpToDate: upToDate}, nil
@@ -204,8 +199,8 @@ func (e *external) resolveConfig(ctx context.Context, mg *civ1alpha1.Pipeline) (
 	if cfg.ConfigMapRef != nil {
 		cm := &corev1.ConfigMap{}
 		nn := types.NamespacedName{
-			Namespace: cfg.ConfigMapRef.SecretReference.Namespace,
-			Name:      cfg.ConfigMapRef.SecretReference.Name,
+			Namespace: cfg.ConfigMapRef.Namespace,
+			Name:      cfg.ConfigMapRef.Name,
 		}
 		if err := e.kube.Get(ctx, nn, cm); err != nil {
 			return "", fmt.Errorf("getting pipeline configmap: %w", err)

@@ -77,10 +77,7 @@ func (e *external) Observe(ctx context.Context, mg *civ1alpha1.Job) (managed.Ext
 		mg.Status.AtProvider.NextBuild = job.NextBuild.ID
 	}
 
-	upToDate := true
-	if mg.Spec.ForProvider.Paused != nil && *mg.Spec.ForProvider.Paused != job.Paused {
-		upToDate = false
-	}
+	upToDate := mg.Spec.ForProvider.Paused == nil || *mg.Spec.ForProvider.Paused == job.Paused
 
 	mg.SetConditions(xpv1.Available())
 	meta.SetExternalName(mg, jobName)

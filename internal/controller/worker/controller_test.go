@@ -32,7 +32,7 @@ func (m *mockClient) PruneWorker(name string) error {
 	return nil
 }
 
-func newWorkerMR(name, desiredState string) *civ1alpha1.Worker {
+func newWorkerMR(name, desiredState string) *civ1alpha1.Worker { //nolint:unparam
 	return &civ1alpha1.Worker{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-worker"},
 		Spec: civ1alpha1.WorkerSpec{

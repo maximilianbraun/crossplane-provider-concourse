@@ -60,14 +60,14 @@ func (e *external) Observe(ctx context.Context, mg *civ1alpha1.Worker) (managed.
 
 	for _, w := range workers {
 		if w.Name == mg.Spec.ForProvider.WorkerName {
-			mg.Status.AtProvider.State = string(w.State)
+			mg.Status.AtProvider.State = w.State
 			mg.Status.AtProvider.Version = w.Version
 			mg.Status.AtProvider.Platform = w.Platform
 			mg.Status.AtProvider.ActiveContainers = w.ActiveContainers
 			mg.Status.AtProvider.ActiveVolumes = w.ActiveVolumes
 
 			upToDate := true
-			if mg.Spec.ForProvider.DesiredState != "" && mg.Spec.ForProvider.DesiredState != string(w.State) {
+			if mg.Spec.ForProvider.DesiredState != "" && mg.Spec.ForProvider.DesiredState != w.State {
 				upToDate = false
 			}
 

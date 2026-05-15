@@ -8,7 +8,7 @@ import (
 
 // BasicAuthCredentials holds credentials for the OAuth2 password-grant flow.
 type BasicAuthCredentials struct {
-	Username          string                `json:"username"`
+	Username          string                 `json:"username"`
 	PasswordSecretRef xpv1.SecretKeySelector `json:"passwordSecretRef"`
 }
 

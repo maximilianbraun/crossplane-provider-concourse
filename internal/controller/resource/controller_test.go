@@ -44,7 +44,7 @@ func (m *mockTeam) UnpinResource(ref atc.PipelineRef, resourceName string) (bool
 	return true, nil
 }
 
-func newResourceMR(team, pipeline, resource string, pinned map[string]string) *civ1alpha1.PipelineResource {
+func newResourceMR(team, pipeline, resource string, pinned map[string]string) *civ1alpha1.PipelineResource { //nolint:unparam
 	return &civ1alpha1.PipelineResource{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-resource"},
 		Spec: civ1alpha1.ResourceSpec{

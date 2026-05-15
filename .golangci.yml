@@ -7,7 +7,6 @@ linters:
     - copyloopvar
     - dupl
     - errcheck
-    - ginkgolinter
     - goconst
     - gocyclo
     - govet
@@ -22,12 +21,7 @@ linters:
     - unconvert
     - unparam
     - unused
-    - logcheck
   settings:
-    custom:
-      logcheck:
-        type: "module"
-        description: Checks Go logging calls for Kubernetes logging conventions.
     revive:
       rules:
         - name: comment-spacings
@@ -35,6 +29,7 @@ linters:
     modernize:
       disable:
         - omitzero
+        - newexpr
   exclusions:
     generated: lax
     rules:

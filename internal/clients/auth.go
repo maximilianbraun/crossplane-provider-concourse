@@ -12,8 +12,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 	goconcourse "github.com/concourse/concourse/go-concourse/concourse"
+	xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 
 	providerv1alpha1 "github.com/maximilianbraun/crossplane-provider-concourse/apis/v1alpha1"
 )
@@ -117,8 +117,8 @@ func buildTLSConfig(ctx context.Context, kube client.Client, pc *providerv1alpha
 func readSecretValue(ctx context.Context, kube client.Client, ref xpv1.SecretKeySelector) (string, error) {
 	secret := &corev1.Secret{}
 	nn := types.NamespacedName{
-		Namespace: ref.SecretReference.Namespace,
-		Name:      ref.SecretReference.Name,
+		Namespace: ref.Namespace,
+		Name:      ref.Name,
 	}
 	if err := kube.Get(ctx, nn, secret); err != nil {
 		return "", fmt.Errorf("getting secret %s: %w", nn, err)

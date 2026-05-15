@@ -6,6 +6,7 @@ import (
 
 	"github.com/concourse/concourse/atc"
 	goconcourse "github.com/concourse/concourse/go-concourse/concourse"
+	"k8s.io/utils/ptr"
 
 	civ1alpha1 "github.com/maximilianbraun/crossplane-provider-concourse/apis/ci/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,9 +51,7 @@ func (m *mockTeam) UnpauseJob(ref atc.PipelineRef, jobName string) (bool, error)
 	return true, nil
 }
 
-func boolPtr(b bool) *bool { return &b }
-
-func newJobMR(team, pipeline, job string, paused *bool) *civ1alpha1.Job {
+func newJobMR(team, pipeline, job string, paused *bool) *civ1alpha1.Job { //nolint:unparam
 	return &civ1alpha1.Job{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-job"},
 		Spec: civ1alpha1.JobSpec{
@@ -78,7 +77,7 @@ func TestObserve_JobFound(t *testing.T) {
 		},
 	}
 	e := &external{concourse: mc}
-	mg := newJobMR("team", "pipeline", "my-job", boolPtr(false))
+	mg := newJobMR("team", "pipeline", "my-job", ptr.To(false))
 
 	obs, err := e.Observe(context.Background(), mg)
 	if err != nil {
@@ -125,7 +124,7 @@ func TestObserve_PauseDrift(t *testing.T) {
 		},
 	}
 	e := &external{concourse: mc}
-	mg := newJobMR("team", "pipeline", "my-job", boolPtr(true))
+	mg := newJobMR("team", "pipeline", "my-job", ptr.To(true))
 
 	obs, err := e.Observe(context.Background(), mg)
 	if err != nil {
@@ -139,7 +138,7 @@ func TestObserve_PauseDrift(t *testing.T) {
 func TestUpdate_PauseJob(t *testing.T) {
 	mc := &mockClient{}
 	e := &external{concourse: mc}
-	mg := newJobMR("team", "pipeline", "my-job", boolPtr(true))
+	mg := newJobMR("team", "pipeline", "my-job", ptr.To(true))
 
 	_, err := e.Update(context.Background(), mg)
 	if err != nil {
@@ -154,7 +153,7 @@ func TestUpdate_PauseJob(t *testing.T) {
 func TestUpdate_UnpauseJob(t *testing.T) {
 	mc := &mockClient{}
 	e := &external{concourse: mc}
-	mg := newJobMR("team", "pipeline", "my-job", boolPtr(false))
+	mg := newJobMR("team", "pipeline", "my-job", ptr.To(false))
 
 	_, err := e.Update(context.Background(), mg)
 	if err != nil {
