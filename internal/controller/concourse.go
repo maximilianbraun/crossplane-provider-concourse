@@ -7,6 +7,7 @@ import (
 	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/build"
 	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/job"
 	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/pipeline"
+	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/providerconfig"
 	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/resource"
 	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/team"
 	"github.com/maximilianbraun/crossplane-provider-concourse/internal/controller/worker"
@@ -14,6 +15,10 @@ import (
 
 // Setup registers all controllers with the Manager.
 func Setup(mgr ctrl.Manager, cache *clients.Cache) error {
+	if err := providerconfig.Setup(mgr); err != nil {
+		return err
+	}
+
 	for _, setup := range []func(ctrl.Manager, *clients.Cache) error{
 		team.Setup,
 		pipeline.Setup,
