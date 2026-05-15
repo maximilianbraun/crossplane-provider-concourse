@@ -1,0 +1,11 @@
+apiVersion: ci.concourse.crossplane.io/v1alpha1
+kind: Build
+metadata:
+  name: hello-build-1
+spec:
+  forProvider:
+    teamName: my-team
+    pipelineName: hello-world
+    jobName: hello
+  providerConfigRef:
+    name: default

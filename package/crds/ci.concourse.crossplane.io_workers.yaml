@@ -4,7 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.21.0
-  name: pipelines.ci.concourse.crossplane.io
+  name: workers.ci.concourse.crossplane.io
 spec:
   group: ci.concourse.crossplane.io
   names:
@@ -12,10 +12,10 @@ spec:
     - crossplane
     - managed
     - concourse
-    kind: Pipeline
-    listKind: PipelineList
-    plural: pipelines
-    singular: pipeline
+    kind: Worker
+    listKind: WorkerList
+    plural: workers
+    singular: worker
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -25,8 +25,8 @@ spec:
     - jsonPath: .status.conditions[?(@.type=='Ready')].status
       name: READY
       type: string
-    - jsonPath: .metadata.annotations.crossplane\.io/external-name
-      name: EXTERNAL-NAME
+    - jsonPath: .status.atProvider.state
+      name: STATE
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: AGE
@@ -34,8 +34,9 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: A Pipeline is a managed resource that represents a Concourse
-          CI pipeline.
+        description: |-
+          A Worker is a managed resource that represents a Concourse CI worker.
+          Workers self-register; this resource observes and manages their lifecycle state.
         properties:
           apiVersion:
             description: |-
@@ -55,7 +56,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: PipelineSpec defines the desired state of a Pipeline.
+            description: WorkerSpec defines the desired state of a Worker.
             properties:
               deletionPolicy:
                 default: Delete
@@ -72,139 +73,21 @@ spec:
                 - Delete
                 type: string
               forProvider:
-                description: PipelineParameters are the configurable fields of a Pipeline.
+                description: WorkerParameters are the configurable fields of a Worker.
                 properties:
-                  config:
-                    description: Config is the pipeline configuration source.
-                    properties:
-                      configMapRef:
-                        description: ConfigMapRef references a ConfigMap containing
-                          the pipeline YAML.
-                        properties:
-                          key:
-                            description: The key to select.
-                            type: string
-                          name:
-                            description: Name of the secret.
-                            type: string
-                          namespace:
-                            description: Namespace of the secret.
-                            type: string
-                        required:
-                        - key
-                        - name
-                        - namespace
-                        type: object
-                      inline:
-                        description: Inline is the raw pipeline YAML.
-                        type: string
-                    type: object
-                  exposed:
-                    description: Exposed sets whether the pipeline is publicly visible.
-                    type: boolean
-                  paused:
-                    description: Paused sets whether the pipeline is paused.
-                    type: boolean
-                  pipelineName:
-                    description: PipelineName is the Concourse pipeline name. If omitted,
-                      metadata.name is used.
+                  desiredState:
+                    description: DesiredState is the target state for the worker (running,
+                      landing, retiring).
+                    enum:
+                    - running
+                    - landing
+                    - retiring
                     type: string
-                  teamName:
-                    description: TeamName is the resolved Concourse team name.
+                  workerName:
+                    description: WorkerName is the name of the Concourse worker.
                     type: string
-                  teamRef:
-                    description: TeamRef is the name of the Team MR this pipeline
-                      belongs to.
-                    properties:
-                      name:
-                        description: Name of the referenced object.
-                        type: string
-                      policy:
-                        description: Policies for referencing.
-                        properties:
-                          resolution:
-                            default: Required
-                            description: |-
-                              Resolution specifies whether resolution of this reference is required.
-                              The default is 'Required', which means the reconcile will fail if the
-                              reference cannot be resolved. 'Optional' means this reference will be
-                              a no-op if it cannot be resolved.
-                            enum:
-                            - Required
-                            - Optional
-                            type: string
-                          resolve:
-                            description: |-
-                              Resolve specifies when this reference should be resolved. The default
-                              is 'IfNotPresent', which will attempt to resolve the reference only when
-                              the corresponding field is not present. Use 'Always' to resolve the
-                              reference on every reconcile.
-                            enum:
-                            - Always
-                            - IfNotPresent
-                            type: string
-                        type: object
-                    required:
-                    - name
-                    type: object
-                  teamSelector:
-                    description: A Selector selects an object.
-                    properties:
-                      matchControllerRef:
-                        description: |-
-                          MatchControllerRef ensures an object with the same controller reference
-                          as the selecting object is selected.
-                        type: boolean
-                      matchLabels:
-                        additionalProperties:
-                          type: string
-                        description: MatchLabels ensures an object with matching labels
-                          is selected.
-                        type: object
-                      policy:
-                        description: Policies for selection.
-                        properties:
-                          resolution:
-                            default: Required
-                            description: |-
-                              Resolution specifies whether resolution of this reference is required.
-                              The default is 'Required', which means the reconcile will fail if the
-                              reference cannot be resolved. 'Optional' means this reference will be
-                              a no-op if it cannot be resolved.
-                            enum:
-                            - Required
-                            - Optional
-                            type: string
-                          resolve:
-                            description: |-
-                              Resolve specifies when this reference should be resolved. The default
-                              is 'IfNotPresent', which will attempt to resolve the reference only when
-                              the corresponding field is not present. Use 'Always' to resolve the
-                              reference on every reconcile.
-                            enum:
-                            - Always
-                            - IfNotPresent
-                            type: string
-                        type: object
-                    type: object
-                  vars:
-                    description: Vars are template variables passed to the pipeline
-                      config.
-                    items:
-                      description: PipelineVar is a key-value variable passed to the
-                        pipeline.
-                      properties:
-                        name:
-                          type: string
-                        value:
-                          type: string
-                      required:
-                      - name
-                      - value
-                      type: object
-                    type: array
                 required:
-                - config
+                - workerName
                 type: object
               managementPolicies:
                 default:
@@ -293,23 +176,28 @@ spec:
             - forProvider
             type: object
           status:
-            description: PipelineStatus represents the observed state of a Pipeline.
+            description: WorkerStatus represents the observed state of a Worker.
             properties:
               atProvider:
-                description: PipelineObservation are the observable fields of a Pipeline.
+                description: WorkerObservation are the observable fields of a Worker.
                 properties:
-                  configHash:
-                    description: ConfigHash is the SHA256 of the last-applied config.
-                    type: string
-                  exposed:
-                    description: Exposed indicates current expose state.
-                    type: boolean
-                  id:
-                    description: ID is the Concourse-assigned pipeline ID.
+                  activeContainers:
+                    description: ActiveContainers is the number of containers on this
+                      worker.
                     type: integer
-                  paused:
-                    description: Paused indicates current pause state.
-                    type: boolean
+                  activeVolumes:
+                    description: ActiveVolumes is the number of volumes on this worker.
+                    type: integer
+                  platform:
+                    description: Platform is the worker's platform (linux, darwin,
+                      windows).
+                    type: string
+                  state:
+                    description: State is the current worker state.
+                    type: string
+                  version:
+                    description: Version is the worker's reported version.
+                    type: string
                 type: object
               conditions:
                 description: Conditions of the resource.

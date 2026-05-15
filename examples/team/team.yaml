@@ -1,0 +1,16 @@
+apiVersion: ci.concourse.crossplane.io/v1alpha1
+kind: Team
+metadata:
+  name: my-team
+spec:
+  forProvider:
+    teamName: my-team
+    roles:
+      - name: owner
+        users:
+          - admin
+      - name: member
+        groups:
+          - github:my-org:developers
+  providerConfigRef:
+    name: default

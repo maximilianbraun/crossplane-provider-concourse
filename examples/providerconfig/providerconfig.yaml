@@ -1,0 +1,13 @@
+apiVersion: concourse.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  url: https://concourse.example.com
+  credentials:
+    basicAuth:
+      username: admin
+      passwordSecretRef:
+        name: concourse-creds
+        namespace: crossplane-system
+        key: password

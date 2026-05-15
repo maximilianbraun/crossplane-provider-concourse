@@ -1,0 +1,12 @@
+apiVersion: ci.concourse.crossplane.io/v1alpha1
+kind: Job
+metadata:
+  name: hello-job
+spec:
+  forProvider:
+    teamName: my-team
+    pipelineName: hello-world
+    jobName: hello
+    paused: false
+  providerConfigRef:
+    name: default

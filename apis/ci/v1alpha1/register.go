@@ -32,6 +32,8 @@ func init() {
 		&Pipeline{}, &PipelineList{},
 		&Job{}, &JobList{},
 		&Build{}, &BuildList{},
+		&Worker{}, &WorkerList{},
+		&PipelineResource{}, &PipelineResourceList{},
 	)
 }
 
