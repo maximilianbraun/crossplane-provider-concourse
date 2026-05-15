@@ -1,7 +1,0 @@
-processor:
-  ignoreTypes:
-    - ".*List$"
-  ignoreFields:
-    - "TypeMeta\\..*"
-render:
-  kubernetesVersion: "1.30"
