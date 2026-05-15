@@ -1,0 +1,7 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-concourse
+spec:
+  controller:
+    image: ghcr.io/maximilianbraun/provider-concourse:latest

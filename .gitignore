@@ -31,3 +31,6 @@ go.work
 
 # mkdocs build output
 site/
+
+# Provider binary
+provider
